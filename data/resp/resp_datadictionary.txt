@@ -1,0 +1,61 @@
+id: observation ID
+
+zone: environmental pollution zone
+1 -- zone of strong exposition
+2 -- zone of lesser exposition
+3 -- increased ozone exposition
+
+allergy:
+1/0 -- allergic illness of respiratory tracts (yes/no)
+
+laryngitis:
+1/0 -- laryngitis diagnosed (yes/no)
+
+mother_smokes:
+1/0 -- mother smoker (yes/no)
+
+father_smokes:
+1/0 -- father smokes (yes/no)
+
+edu_parents: education of parents
+1 -- minimum level
+2 -- moderate level
+3 -- high level
+
+freq_cold:
+1/0 -- frequently has cold (yes/no)
+
+freq_cough:
+1/0 -- frequent coughing (yes/no)
+
+mob, dob, yob:
+Month, Day, Year of Birth
+
+height:
+height
+
+sex:
+sex
+1 -- male
+2 -- female
+
+moe, doe, yoe:
+Month, Day, Year of Examination
+
+weight:
+weight
+
+fvc:
+vital capacity of the lung
+
+pef:
+peak (air)flow measurement
+
+fef50:
+airflow, 50\% completion of exhaling
+
+fef75:
+airflow, 75\% completion of exhaling
+
+lubro:
+1/0 -- illness of lung or bronchial tubes (yes/no)
