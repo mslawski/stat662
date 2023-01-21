@@ -1,0 +1,7 @@
+The full data set can be downloaded from Kaggle:
+
+https://www.kaggle.com/datasets/usdot/flight-delays
+
+For some unknown reason, airports are referenced via a 5-digits code (insteaf of the usual 3-letter code) for the month of October only. 
+The 5-digits code can be found in the file "flightdelay_L_AIRPORT_ID.csv at master · srcole_flightdelay · GitHub.html"
+
