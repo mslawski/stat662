@@ -1,0 +1,13 @@
+rent: monthly rent in EUR
+rent_per_sqm: monthly rent (EUR) per square meter
+area: size of the apartment in square meters
+rooms: number of rooms 
+year_built: year of construction
+district: city district number
+ind_good: indicator variable for "apartment located in a good residential neighborhood" (1/0, -- yes/no)
+ind_best: indicator variable for "apartment located in a good residential neighborhood" (1/0, -- yes/no)
+warm_water: warm water available (1/0, --yes/no)
+central_heating: central heating available (1/0 -- yes/no)
+tiled_bath: tiled bathroom (1/0, -- yes/no)
+extra_bath: additionally equipped bathroom (1/0, -- yes/no)
+extra_kitchen: additionally equipped kitchen (1/0, -- yes/no)  
