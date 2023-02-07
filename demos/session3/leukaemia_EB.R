@@ -22,16 +22,13 @@ mean((muhat - mu)^2)
 mean((zbar - mu)^2)
 
 
-leuk <- leuk[,c(which(isALL == 1), which(isALL == 0))]
 
-rowMeans(leuk) # ok
-apply(leuk, 1, sd) # 1
 
 pdf("../../fig/leuk_meandifference.pdf")
 hist(rowMeans(leuk[,1:45]) -  rowMeans(leuk[,46:72]), nclass = 50)
 dev.off()
 
-plot(ecdf(rowMeans(leuk[,1:45]) -  rowMeans(leuk[,46:72])))
+
 
 
 
