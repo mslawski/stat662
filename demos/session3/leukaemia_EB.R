@@ -1,10 +1,11 @@
-### Leukaemia data set
+### Leukaemia data set -- J-S estimation
 ls()
 leuk <- read.csv("../leukemia_small.csv")
 isALL <- numeric(ncol(leuk))
 isALL[grep("ALL", colnames(leuk))] <- 1
 
-n <- 40 #35
+# size of subsample (the smaller the better the peformance of the J-S estimator)
+n <- 25 #35#40
 sel <- which(isALL == 1)[1:n]
 Z <- t(leuk[,sel])
 zbar <- colMeans(Z)
@@ -24,12 +25,9 @@ mean((zbar - mu)^2)
 
 
 
-pdf("../../fig/leuk_meandifference.pdf")
-hist(rowMeans(leuk[,1:45]) -  rowMeans(leuk[,46:72]), nclass = 50)
-dev.off()
-
-
-
+#pdf("../../fig/leuk_meandifference.pdf")
+#hist(rowMeans(leuk[,1:45]) -  rowMeans(leuk[,46:72]), nclass = 50)
+#dev.off()
 
 
 
