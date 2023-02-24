@@ -1,6 +1,6 @@
 ### Part 1: Data preparation and Processing
-
-flights <- read.csv("flight_delays/flights.csv")
+ls()
+flights <- read.csv("../data/flight_delays/flights.csv")
 nrow(flights) ### n = 5.8M records
 
 airport_list <- c("ATL", "DFW", "DEN", "ORD", "LAX", "CLT", "MCO", "LAS", "PHX", "MIA", "JFK", "SFO", "SEA", "EWR", "IAH", "BOS", "MSP", "DTW", "FLL")
@@ -63,7 +63,7 @@ lambdagrid <- seq(from = 0, to = 1, by = 0.05)
 # loss to be used for evaluating goodness-of-fit on hold-out data (Stein loss for a
 # single-hold out datum)
 
-loss <- function(Chativ, dat){
+loss <- function(Chatinv, dat){
     d <- ncol(Chat)
     sum(dat %*% drop(Chatinv %*% dat))/d - (1/d) * determinant(Chatinv, log = TRUE)$modulus
 }
@@ -95,7 +95,7 @@ for(j in 1:length(lambdagrid)){
         Chat <- lambda * C_in + (1 - lambda) * T
         Chatinv <- solve(Chat)
         # loss on the hold-out data
-        tmp_err = tmp_err + loss(Chat, X_out_cs)
+        tmp_err = tmp_err + loss(Chatinv, X_out_cs)
     }
 
     LOOCV_err[j] <- tmp_err
