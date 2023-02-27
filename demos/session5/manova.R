@@ -111,3 +111,5 @@ A[d] <- 1
 D <- t(rep(0, q))
 
 lin_hypothesis_test(A, D)
+# quicker:
+anova(mlm, test = "Wilks") # this performs the Wilks' tests for each of the variables
