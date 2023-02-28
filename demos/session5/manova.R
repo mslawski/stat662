@@ -113,3 +113,10 @@ D <- t(rep(0, q))
 lin_hypothesis_test(A, D)
 # quicker:
 anova(mlm, test = "Wilks") # this performs the Wilks' tests for each of the variables
+
+# Example 2:
+# test whether freq_cold and freq_cough have the same effect on all the outcome variables
+A <- t(c(0, 0, 1, -1, 0, 0))
+D <- t(rep(0,q))
+
+lin_hypothesis_test(A, D)
