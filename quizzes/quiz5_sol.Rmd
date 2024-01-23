@@ -1,6 +1,6 @@
 ---
 title: "STAT 662, Quiz 5"
-author: "Alice Zormelo"
+author: ""
 date: "02/27/2023"
 output:
   pdf_document:
