@@ -1,6 +1,6 @@
----
+f---
 title: "STAT662 Quiz 2"
-author: "Lisa Drummond 2/6/2023"
+author: 
 format: pdf
 ---
 
