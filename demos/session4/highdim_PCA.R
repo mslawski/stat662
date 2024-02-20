@@ -16,21 +16,20 @@ S <- crossprod(X) / n # assuming that the mean is known as zero, this is the sam
 eigS <- eigen(S)
 pdf("../fig/MP1.pdf")
 hist(eigS$values, nclass = 20, prob = TRUE)
-# theoretical distribution of the eigenvalues based on the M-P law
+# theoretical distribution of the eigenvalues based on the Marchenko-Pastur law (MP law for short)
 alpha <- 0.2 # d/n ratio
 tmin <- (1 - sqrt(alpha))^2
 tmax <- (1 + sqrt(alpha))^2
 plot(function(t) sqrt((tmax - t)*(t - tmin)/t), add = TRUE, col = "blue", lwd = 2, from = tmin, to = tmax)
 dev.off()
-                                        #
+#
 pdf("../fig/MP2.pdf")
 plot(ecdf(eigS$values))
 dev.off()
 
-# distribution of
+# distribution of correlations
 C <- cov2cor(S)
 x11()
-
 pdf("../fig/MP3.pdf")
 hist(C[lower.tri(C)], nclass = 100)
 dev.off()
@@ -38,9 +37,9 @@ dev.off()
 # covariance thresholding
 lambda <- sqrt(log(d)/n) # sqrt(2 * log(d)/n) ---> factor \sqrt{2} will achieve better performance
 Csp <- C * (abs(C) > lambda)
-
+# histogram of off-diagonal entries of the thresholded sample correlation matrix
 hist(Csp[lower.tri(Csp)], nclass = 100)
-
+# eigenvalue distribution of of the thresholded sample correlation matrix
 eigCsp <- eigen(Csp)
 hist(eigCsp$values, nclass = 20)
 
@@ -48,11 +47,12 @@ sum(eigCsp$values)
 
 ### A banded covariance example: moving average process
 library(mvtnorm)
-                                        # generate data from a moving average process (window 3)
 
+# generate data from a moving average process (window 3)
 rho <- c(0.5, 0.4, 0.2)
 k <- 3
 d <- 200
+# here we fill the individual entries of the population covariance matrix
 Sigma <- matrix(nrow = d, ncol = d, data = 0)
 diag(Sigma) <- 1
 for(j in 1:d){
@@ -78,6 +78,7 @@ eigSigma <- eigen(Sigma)$values
 image(Sigma)
 # generate data
 X <- rmvnorm(n = n, sigma = Sigma)
+# sample covariance matrix
 S <- crossprod(X) / n
 eigS <- eigen(S)$values
 # theoretical vs.~empirical eigenvalues
@@ -124,16 +125,21 @@ eigCleuk_sp <- eigen(Cleuk_sp, only.values = TRUE)
 #qqplot(eigCleuk, eigCleuk_sp$values)
 #abline(0,1)
 
+# boxplot of eigenvalue distribution of raw and threholded correlation matrix
 boxplot(cbind(eigCleuk[1:n], eigCleuk_sp$values[1:n]))
 
 ### real data 2: excerpt from Beijing Climate data
 
 ls()
 data_all <- read.csv("../data/climate/data_all.csv", header = TRUE)
+# extract all data from weather station Nongzhanguan
 dat_Nong <- data_all[data_all$station == "Nongzhanguan",]
 rm(data_all)
 
 # here, we analyze the variable "RAIN"
+# we are interested in correlations within 24-hour windows (i.e., d = 24)
+# for this purpose, we partition the data set by days (24-hr windows), and concatenate
+# each 24-hr block vertically (i.e., one row = one 24-hr period, considered independently of each other -- of course, a simplifcation).
 dates <- paste(dat_Nong$month, dat_Nong$day, dat_Nong$year, sep = "-")
 dat_day <- dat_Nong[,colnames(dat_Nong) %in% c("hour", "day", "month", "year", "RAIN")]
 
@@ -171,10 +177,12 @@ loss <- function(C0, Chatinv){
 #    -sum(c(C0inv - Chatinv) * c(C0 - Chat))/(2 * d)
 #}
 
+# here we check the loss of the plain correlation matrix
 dat_train <- dat_final[train,]
 Ctrain <- cor(dat_train)
 loss(Cfull, solve(Ctrain))
-#loss(Cfull, Ctrain, solve(Ctrain))
+
+# next, we try tapering estimators (with triangular kernel, of varying bandwidth)
 d <- ncol(Ctrain)
 bw <- 10
 W <- (1 - (abs(outer(1:d, 1:d, "-"))/bw))
@@ -185,7 +193,6 @@ pos <- eigCtilde$values >= 0.001
 Chat <- eigCtilde$vectors[,pos] %*% diag(eigCtilde$values[pos])%*% t(eigCtilde$vectors[,pos])
 Chatinv <- eigCtilde$vectors[,pos] %*% diag(1/eigCtilde$values[pos])%*% t(eigCtilde$vectors[,pos])
 loss(Cfull, Chatinv)
-#loss(Cfull, Chat, Chatinv)
 
 # plot cross-validation trace
 bwgr <- 10^(seq(from = 0, to = 1.5, by = 0.1))
@@ -200,6 +207,7 @@ for(k in 1:length(bwgr)){
 }
 
 plot(bwgr, loss_bw)
+# index achieving smallest looss
 bestix <- which.min(loss_bw)
 
 bw <- bwgr[bestix]
@@ -208,10 +216,11 @@ W <- W * (W >= 0)
 Ctilde <- Ctrain * W
 eigCtilde <- eigen(Ctilde)
 
+# QQ-plots comparing eigenvalue distributions of the tapered and plain estimators to the reference (full data set)
 qqplot(eigCfull$values, eigCtilde$values)
-
 qqplot(eigCfull$values, eigen(Ctrain)$values)
 
-# shows difference with small eigenvalues
+# shows difference with small eigenvalues on log-scale
 qqplot(log(eigCfull$values), log(eigCtilde$values))
 qqplot(log(eigCfull$values), log(eigen(Ctrain)$values))
+
