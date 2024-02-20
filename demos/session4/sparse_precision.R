@@ -18,14 +18,19 @@ Adj <- matrix(nr = ncol(marks), nc = ncol(marks), data = 1)
 diag(Adj) <- 0
 Adj[1,c(4,5)] <- 0
 Adj[2,c(4,5)] <- 0
+Adj[c(4,5),1] <- 0
+Adj[c(4,5),2] <- 0
 colnames(Adj) <- colnames(marks)
 rownames(Adj) <- colnames(marks)
 
+# use function fitConGraph in the package ggm
+# this function computes the constrained MLE
+# (subject to the constraint that selected off-diagonal entries are zero)
 fitPrec <- fitConGraph(Adj, cov(marks), n = nrow(marks), cli = list
 (c("vectors", "algebra", "mechanics"),
 c("algebra", "analysis", "statistics")))
 zapsmall(solve(fitPrec$Shat)*1000)
-                                        # note that the selected elements are exactly equal to zero.
+# note that the selected elements are exactly equal to zero.
 
 
 ### chaingraph and graphical lasso
@@ -61,7 +66,7 @@ Stest <- crossprod(Xtest)/n_te
 lambdagrid <- 10^seq(from = -3, to = 0, by = 0.1)#10^seq(from = -4, to = 0, by = 0.25)
 
 glasso_sol <- glassopath(S, rholist = lambdagrid, penalize.diagonal=FALSE)
-image(glasso_sol$wi[,,length(lambdagrid)])
+image(glasso_sol$wi[,,length(lambdagrid)-20])
 
 # Stein loss (negative log-likelihood) on the test set
 loss <- function(Omegahat) -determinant(Omegahat, log = TRUE)$modulus + sum(Omegahat * Stest)
@@ -78,6 +83,12 @@ image(glasso_sol$wi[,,which.min(testerrs)])
 ### real data example: an excerpt from the Climate data
 
 data_all <- read.csv("../data/climate/data_all.csv", header = TRUE)
+
+# This example follows a similar pattern as the example in
+# highdim_PCA.R. The main difference is that the variable
+# of interest is now the PM2.5 concentration. As before,
+# we extract blocks of 24 hours and consider the 24 hours in a day as variables.
+# Different rows are treated as different days (treated independently, for simplicity)
 
 dat_Nong <- data_all[data_all$station == "Nongzhanguan",]
 rm(data_all)
@@ -102,8 +113,8 @@ dat_final <- log(dat_day_f)
 Cfull <- cor(dat_final)
 
 ### --- sparse inverse covariance matrix seems like a suitable model
-#image(Cfull)
-#image(solve(Cfull))
+image(Cfull)
+image(solve(Cfull))
 
 # select only every 10th data point out of the training set
 # (note that training set and test set are supposed be
