@@ -14,6 +14,7 @@ resp$zone <- as.factor(resp$zone)
 contrasts(resp$zone) = contr.sum(3)
 manova.zone <- manova(cbind(log(resp$fef50), log(resp$fef75)) ~ zone, data = resp)
 summary(manova.zone, test = "Wilks")
+# model.matrix(manova.zone)
 
 # we can compare this to two univariate ANOVA's:
 anova.fef50.zone <- anova(lm(log(resp$fef50) ~ zone, data = resp))
@@ -48,8 +49,12 @@ print(anova.fef75.edu_parents)
 ### "mother_smokes", "freq_cold", "freq_cough", "sex" (all binary)
 ### "weight" (continuous)
 
+# re-code resp$sex to 0/1 (all other binary variables are already coded as 0/1)
+resp$sex <- resp$sex - 1
+
+
 mlm <- lm(cbind(log(fvc), log(pef), log(fef50), log(fef75))
-   ~ mother_smokes + freq_cold + freq_cough + sex + weight,
+   ~ mother_smokes + freq_cold + freq_cough +  sex + weight,
    data = resp)
 
 coef(mlm)
@@ -113,6 +118,11 @@ D <- t(rep(0, q))
 lin_hypothesis_test(A, D)
 # quicker:
 anova(mlm, test = "Wilks") # this performs the Wilks' tests for each of the variables
+
+# we can also use this function to compare two models:
+# in this model, we drop the variable "weight"
+mlm0 <- update(mlm, formula = ~. -weight)
+anova(mlm, mlm0, test = "Wilks") # same result as the previous call to lin_hypothesis_test.
 
 # Example 2:
 # test whether freq_cold and freq_cough have the same effect on all the outcome variables
