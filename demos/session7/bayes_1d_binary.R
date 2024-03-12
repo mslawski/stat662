@@ -23,9 +23,12 @@ probY_given_x <- function(x){
     }
 }
 
-
+# calculate conditional probabilities p(Y = 1|X = x) for all sampled X's
 probs <- sapply(X, probY_given_x)
 
-Y <- (2*(probs > runif(n)))-1
+# simulate class label given conditional probability
+Y <- (2*(probs > runif(n)))-1 
 
+# plot X's and Y's 
 plot(X, Y, col = Y+2, pch = 16)
+
