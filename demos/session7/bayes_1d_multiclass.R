@@ -1,3 +1,4 @@
+ls()
 K <- 3 # number of classes
 probY <- c(0.3, 0.33, 0.37) # class probabilities
 
@@ -6,11 +7,10 @@ f2 <- function(x) 3 * dt(3*x, df = 4) ## conditional PDF of X given Y = 2
 
 f3 <- function(x) 0.5*dexp(abs(x - 2.5), rate = 2) ## conditional PDF of X given Y = 3
 
-fs <- list(f1, f2, f3) 
+fs <- list(f1, f2, f3)
 
-f <- function(x) sum(probY*unlist( lapply(fs, function(z) z(x)) ) )
-
-                                        # integrate(function(x) sapply(x, f), lower = -11, upper = 11) -> should integrate to one
+f <- function(x) sum(probY*unlist( lapply(fs, function(z) z(x)) ) ) ## marginal PDF of X
+# integrate(function(x) sapply(x, f), lower = -11, upper = 11) -> should integrate to one
 
 
 xgr <- seq(-6, 6, 0.01)
@@ -24,21 +24,25 @@ lines(xgr, sapply(xgr, f2), col = "red", type = "l")
 lines(xgr, sapply(xgr, f3), col = "blue", type = "l")
 
 
-# scaled by class probabilities 
+# conditional PDFs scaled by class probabilities
 
 #pdf("pluginbayes.pdf")
 plot(xgr, sapply(xgr, f1) * probY[1], col = "green", type = "l", ylim = c(0, 0.4), xlab = "x", ylab = "", cex.lab = 2, cex.main = 2, cex.axis = 1.7)
 lines(xgr, sapply(xgr, f2) * probY[2], col = "red", type = "l")
 lines(xgr, sapply(xgr, f3) * probY[3], col = "blue", type = "l")
 
-# find cutoffs for optimal decision rule
+# find cutoffs for optimal decision rule:
+# to find the optimal cutoff, we need to find the points of intersection
+# of the densities 1 and 2 and 2 and 3 (scaled by their respective class probabilities)
+# the intersection points can be found by calling the uniroot function
+# (which retrieves the roots of functions inside a pre-specified interval)
 
 r12 <- uniroot(function(x) f1(x)*probY[1] - f2(x)*probY[2], c(-3, -1))
 r23 <- uniroot(function(x) f2(x)*probY[1] - f3(x)*probY[2], c(0, 2))
 
 abline(v = c(r12$root, r23$root), lty = "dashed", lwd = 3)
 
-#### sample data
+#### sample data from the three classes
 set.seed(123)
 n = 10000
 Y <- sample(1:3, size = n, replace = TRUE, prob = probY)
@@ -50,6 +54,7 @@ r3 <-  function() 2.5 + rnorm(1) * rexp(n = 1, rate = 2)
 
 rs <- list(r1, r2, r3)
 
+### sample X given Y
 X <- sapply(Y, function(z) do.call(rs[[z]], args = list()))
 
 points(X[Y == 1], rep(0.01, ns[1]), col = "green", cex = 1.3)
@@ -59,7 +64,7 @@ points(X[Y == 3], rep(0.01, ns[3]), col = "blue", cex = 1.3)
 #legend(x = -6.8, y = .425, legend = c(expression(f[1]%.%P(Y == 1), f[2]%.%P(Y == 2), f[3]%.%P(Y == 3))), cex = 1.5, lwd = 2, col = c("green", "red", "blue"))
 #dev.off()
 
-### histogram estimator
+### towards implementation of the plug-in rule: the histogram estimator
 
 a = -6
 b <- 6
@@ -67,7 +72,7 @@ m = round(n^(1/3)) # number of bins
 bins <- seq(from = a, to = b, length = m+1)
 h = (b - a)/m
 phat <- table(cut(X, bins))/n
-fhat <- function(x) phat[as.numeric(cut(x, bins))]/h 
+fhat <- function(x) phat[as.numeric(cut(x, bins))]/h
 #integrate(fhat, lower =-6, upper = 6) #check
 
 plot(fhat, from = -6, to = 6, type = "l", n= 1000, add = TRUE)
